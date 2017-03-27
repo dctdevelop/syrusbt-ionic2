@@ -24,13 +24,25 @@ export class Page1 {
 
   scan(){
       this.devices = [];
-      BLE.scan([],10).subscribe(
+      BLE.startScan([]).subscribe(
         (device)=>{
             this.zone.run(()=>{
                 if(device.name!= undefined && device.name.indexOf("Syrus 3GBT") != -1)
                     this.devices.push(device);
             })
         },
+        (err)=>{
+            console.error(err);
+        }
+      );
+  }
+
+  stopScan(){
+	BLE.stopScan().then(
+        (data)=>{
+			console.log(data);
+        })
+		.catch(
         (err)=>{
             console.error(err);
         }
