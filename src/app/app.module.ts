@@ -7,6 +7,8 @@ import { Page2 } from '../pages/page2/page2';
 
 import {Parser} from '../providers/parser';
 import {BTCOM} from '../providers/bt-com';
+import {BTEVENT} from '../providers/bt-event';
+import {ParserEvents} from '../providers/parser-events';
 import {Preferences} from '../providers/preferences';
 
 import {Storage} from '@ionic/storage';
@@ -39,7 +41,7 @@ export function createTranslateLoader(http: Http) {
     Page2
   ],
 
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler},Parser, Preferences,BTCOM, Storage]
-  
+  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler},
+  Parser, Preferences,BTCOM,BTEVENT,ParserEvents, Storage]
 })
 export class AppModule {}

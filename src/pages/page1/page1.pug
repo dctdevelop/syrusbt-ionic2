@@ -1,18 +1,19 @@
 ion-header
-    ion-navbar(color="primary")
-        button(ion-button="",menuToggle="")
-            ion-icon(name="menu")
-        ion-title Syrus Driver Bluetooth
+	ion-navbar(color="primary")
+		button(ion-button="",menuToggle="")
+			ion-icon(name="menu")
+		ion-title Syrus Driver Bluetooth
 ion-content
-    ion-list
-        ion-list-header Syrus Devices
-        button(ion-item="", (click)="connect(device)", *ngFor="let device of devices")
-            | {{ device.name }}
+	ion-list
+		ion-list-header Syrus Devices
+		button(ion-item="", (click)="connect(device)", *ngFor="let device of devices")
+			| {{ device.name }}
 
+	button(ion-button="", (click)="startEvents()") notify
 
 
 ion-footer
-    ion-toolbar
-        button(ion-button="", (click)="scan()",large="", full="", icon-left="")
-            ion-icon(name="search")
-            | {{ 'Scan'  | translate }}
+	ion-toolbar
+		button(ion-button="", (click)="scan()",large="", full="", icon-left="")
+			ion-icon(name="search")
+			| {{ 'Scan'  | translate }}
