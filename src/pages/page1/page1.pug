@@ -9,11 +9,12 @@ ion-content
 		button(ion-item="", (click)="connect(device)", *ngFor="let device of devices")
 			| {{ device.name }}
 
-	button(ion-button="", (click)="startEvents()") notify
 
 
 ion-footer
 	ion-toolbar
-		button(ion-button="", (click)="scan()",large="", full="", icon-left="")
+		button(ion-button="", (click)="scan()", full="", icon-left="", *ngIf="!bt.device")
 			ion-icon(name="search")
 			| {{ 'Scan'  | translate }}
+		button(ion-button="",color="secondary", (click)="startEvents()", full="",
+		*ngIf="bt.device") Subscribe to events

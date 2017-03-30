@@ -6,7 +6,6 @@ import * as moment from 'moment';
 export class ParserEvents {
 
   constructor(public http: Http) {
-    console.log('Hello ParserEvents Provider');
   }
 
   parserDefault(rawData:string){

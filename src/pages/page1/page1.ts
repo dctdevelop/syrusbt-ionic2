@@ -1,8 +1,8 @@
 import { Component,NgZone } from '@angular/core';
-import { NavController, Events, ToastController } from 'ionic-angular';
-import { BTCOM } from '../../providers/bt-com';
+import { NavController, Events, ToastController, LoadingController, Loading } from 'ionic-angular';
 import { Preferences } from '../../providers/preferences';
-import { BLE } from 'ionic-native';
+import { BLE } from '@ionic-native/ble';
+import { BTCOM } from '../../providers/bt-com';
 import { BTEVENT } from "../../providers/bt-event";
 @Component({
   selector: 'page-page1',
@@ -10,29 +10,39 @@ import { BTEVENT } from "../../providers/bt-event";
 })
 export class Page1 {
   devices = [];
-  constructor(public navCtrl: NavController,public bt:BTCOM,
-  public events:Events,public toast:ToastController, public pre:Preferences, public zone:NgZone,
-  public  btev:BTEVENT
+  loader:Loading;
+  constructor(public navCtrl: NavController,
+  public events:Events,
+  public toast:ToastController,
+  public pre:Preferences,
+  public loading:LoadingController,
+  public zone:NgZone,
+  public bt:BTCOM,public btev:BTEVENT, public ble:BLE
   ) {}
 
   ionViewDidLoad(){
 
       this.events.subscribe("device:connected",(device)=>{
+
           this.events.subscribe("command:*",(response)=>{
               console.log(response);
           });
-		//   this.zone.run(()=>{
-		  	this.bt.device = device;
-		//   })
-          this.sendQPV();
+		  	this.loader.dismiss();
+			this.bt.device = device;
+          	this.sendQPV();
       });
+
+	  this.events.subscribe("device:errorConnection", (err)=>{
+		  this.loader.dismiss();
+		  this.toast.create({message:"error connection to syrus", duration:1400}).present();
+	  })
 
   }
 
   scan(){
       this.devices = [];
 	  console.log("scanning");
-      BLE.startScan([]).subscribe(
+      this.ble.startScan([]).subscribe(
         (device)=>{
             this.zone.run(()=>{
                 if(device.name!= undefined && device.name.indexOf("Syrus 3GBT") != -1)
@@ -46,7 +56,7 @@ export class Page1 {
   }
 
   stopScan(){
-	BLE.stopScan().then(
+	this.ble.stopScan().then(
         (data)=>{
 			console.log(data);
         })
@@ -58,6 +68,8 @@ export class Page1 {
   }
 
   connect(device){
+	  this.loader = this.loading.create({content:"Connecting..."})
+	  this.loader.present()
       this.events.publish("device:connect",device);
   }
 

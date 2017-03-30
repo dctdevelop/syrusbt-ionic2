@@ -3,12 +3,12 @@ import { Http } from '@angular/http';
 import 'rxjs/add/operator/map';
 import { BTCOM } from './bt-com';
 import { Events } from "ionic-angular";
-import { BLE } from 'ionic-native';
+import { BLE } from '@ionic-native/ble';
 import { ParserEvents} from '../providers/parser-events';
 @Injectable()
 export class BTEVENT {
 
-  constructor(public http: Http, public bt:BTCOM, public events:Events, public parser:ParserEvents) {
+  constructor(public ble:BLE,public http: Http, public bt:BTCOM, public events:Events, public parser:ParserEvents) {
   }
 
   subscribe(){
@@ -18,7 +18,7 @@ export class BTEVENT {
 		  return
 	  }
 
-	BLE.startNotification(this.bt.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0280-dc70-a07ba85ee4d6")
+	this.ble.startNotification(this.bt.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0280-dc70-a07ba85ee4d6")
         .subscribe(
 			(data)=>{
 				var response = this.parser.parserDefault(this.bt.bytesToString(data))

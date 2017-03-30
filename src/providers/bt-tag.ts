@@ -1,16 +1,16 @@
 import { Injectable,NgZone } from '@angular/core';
 import { Events } from 'ionic-angular';
-import { BLE } from 'ionic-native';
+import { BLE } from '@ionic-native/ble';
 @Injectable()
 export class BTTAG {
     tags =[];
     connected = undefined;
-    constructor(public zone:NgZone, public events:Events){
+    constructor(public zone:NgZone, public events:Events, public ble:BLE){
     }
 
     scanforTags(){
         console.log("scanning");
-        BLE.startScan([]).subscribe(
+        this.ble.startScan([]).subscribe(
             (device)=>{
                 if(device.name != undefined  && (device.name.indexOf("syrustag")!= -1))
                 {
@@ -29,14 +29,14 @@ export class BTTAG {
     }
 
     stopScan(){
-        BLE.stopScan().then(()=>{
+        this.ble.stopScan().then(()=>{
             this.events.publish("tag:stopScan",{});
             console.log("stop Scan");
         });
     }
 
     connectTag(tag){
-        BLE.connect(tag.id).subscribe(
+        this.ble.connect(tag.id).subscribe(
             (data)=>{
                 this.zone.run(()=>{
                     this.events.publish("tag:connected",tag);
@@ -55,7 +55,7 @@ export class BTTAG {
     }
 
     disconnectTag(tag){
-        BLE.disconnect(tag.id).then(()=>{
+        this.ble.disconnect(tag.id).then(()=>{
             this.zone.run(()=>{
                 console.log(tag);
                 this.connected = undefined
@@ -74,7 +74,7 @@ export class BTTAG {
     beepTag(tag){
         var data =new Uint8Array(1);
         data[0]= 0x04;
-        BLE.write(tag.id, "00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-3070-dc70-a07ba85ee4d6",
+        this.ble.write(tag.id, "00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-3070-dc70-a07ba85ee4d6",
         data.buffer).then((data)=>{
             this.events.publish("tag:beeped",tag);
             console.log("beeptag:",data);
@@ -84,7 +84,7 @@ export class BTTAG {
     }
 
     readTag(tag){
-        BLE.read(tag.id, "00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-1070-dc70-a07ba85ee4d6").then(
+        this.ble.read(tag.id, "00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-1070-dc70-a07ba85ee4d6").then(
             (data)=>{
                 console.log("Read Data Crud",data);
                 console.log("Read Data parse",this.parseData(data));
@@ -98,7 +98,7 @@ export class BTTAG {
 
     configurateTag(tag:any){
         var buffer_conf =     new Uint8Array([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]);
-        BLE.write(tag.id,"00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-2070-dc70-a07ba85ee4d6", buffer_conf.buffer)
+        this.ble.write(tag.id,"00000000-dc70-0070-dc70-a07ba85ee4d6","00000000-dc70-2070-dc70-a07ba85ee4d6", buffer_conf.buffer)
         .then((data)=>{
             console.log(data);
         });
@@ -145,13 +145,13 @@ export class BTTAG {
     }
 
 	readRSSI(tag:any){
-		var ble:any = BLE;
-		ble.readRSSI(tag.id).then((val) => {
-			return val;
-		})
-		.catch((err)=>{
-			return err;
-		});
+		console.warn("not supported yeat");
+		// this.ble(tag.id).then((val) => {
+		// 	return val;
+		// })
+		// .catch((err)=>{
+		// 	return err;
+		// });
 	}
 
 

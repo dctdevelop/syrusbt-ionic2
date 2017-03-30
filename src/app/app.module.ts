@@ -11,9 +11,11 @@ import {BTEVENT} from '../providers/bt-event';
 import {ParserEvents} from '../providers/parser-events';
 import {Preferences} from '../providers/preferences';
 
-import {Storage} from '@ionic/storage';
+import {IonicStorageModule} from '@ionic/storage';
 import { TranslateModule, TranslateStaticLoader,TranslateLoader } from 'ng2-translate/ng2-translate';
-
+import {BLE} from '@ionic-native/ble';
+import {SplashScreen} from '@ionic-native/splash-screen';
+import {StatusBar} from '@ionic-native/status-bar';
 export function createTranslateLoader(http: Http) {
     return new TranslateStaticLoader(http, 'assets/i18n', '.json');
 }
@@ -26,6 +28,7 @@ export function createTranslateLoader(http: Http) {
 
   imports: [
     IonicModule.forRoot(MyApp),
+	IonicStorageModule.forRoot(),
     TranslateModule.forRoot({
       provide: TranslateLoader,
       useFactory: (createTranslateLoader),
@@ -42,6 +45,7 @@ export function createTranslateLoader(http: Http) {
   ],
 
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler},
+  BLE,SplashScreen,StatusBar,
   Parser, Preferences,BTCOM,BTEVENT,ParserEvents, Storage]
 })
 export class AppModule {}

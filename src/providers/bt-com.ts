@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
 import {Platform,Events} from 'ionic-angular';
-import { BLE } from 'ionic-native';
+import { BLE } from '@ionic-native/ble';
 import { Parser } from './parser';
 import 'rxjs/add/operator/map';
 @Injectable()
@@ -105,7 +105,7 @@ export class BTCOM {
         ">SBTF",
         ">SBIF",
     ]
-    constructor(public zone: NgZone, public platform:Platform,public events:Events, public parser:Parser){
+    constructor(public zone: NgZone, public platform:Platform,public events:Events,public ble:BLE ,public parser:Parser){
 
         // Socket Mode (only for test)
         if(this.socket_test){
@@ -132,7 +132,7 @@ export class BTCOM {
         else{
 
             this.events.subscribe("device:disconnected",(device)=>{
-                BLE.stopNotification(this.device.id,"00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6");
+                this.ble.stopNotification(this.device.id,"00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6");
                 this.device = undefined;
                 this.imei = undefined;
                 this.version = undefined;
@@ -140,25 +140,27 @@ export class BTCOM {
 
             this.events.subscribe("device:connect",(device)=>{
                 console.log("Connecting to " + device.name);
-                BLE.connect(device.id).subscribe(
+                this.ble.connect(device.id).subscribe(
                     (response)=>{
                         console.log("Connected to "+ device.name);
                         this.device = device;
                         setTimeout(()=>{
                             this.sendBluetoothAuth();
                             this.listen();
+							this.device = device;
                             this.events.publish("device:connected",device);
                         },600);
                     },
                     (err)=>{
                         console.error(err);
+						this.device = undefined;
                         this.events.publish("device:errorConnection",err);
                     }
                 )
             });
 
             this.events.subscribe("device:disconnect",(device)=>{
-                BLE.disconnect(this.device.id).then(
+                this.ble.disconnect(this.device.id).then(
                     (response)=>{
                         this.events.publish("device:disconnected",device);
                     })
@@ -224,14 +226,14 @@ export class BTCOM {
         // Send command larger than 50 on two partitions
         if(msg.length > 50){
             var msgs = this.stringSplit(msg);
-            BLE.writeWithoutResponse(this.device.id,
+            this.ble.writeWithoutResponse(this.device.id,
                 "00000000-dc70-0080-dc70-a07ba85ee4d6",
                 "00000000-dc70-0180-dc70-a07ba85ee4d6",
                 this.stringToBytes(msgs[0])).
                 then((data)=>{
                     console.log("Sending Partition: " + msgs[0]);
                     this.sleep(1000);
-                    BLE.writeWithoutResponse(this.device.id,
+                    this.ble.writeWithoutResponse(this.device.id,
                         "00000000-dc70-0080-dc70-a07ba85ee4d6",
                         "00000000-dc70-0180-dc70-a07ba85ee4d6",
                         this.stringToBytes(msgs[1])).
@@ -254,7 +256,7 @@ export class BTCOM {
 
         //Send a simple command by bluetooth
         else if(this.device != undefined)
-            BLE.writeWithoutResponse(this.device.id,
+            this.ble.writeWithoutResponse(this.device.id,
                 "00000000-dc70-0080-dc70-a07ba85ee4d6",
                 "00000000-dc70-0180-dc70-a07ba85ee4d6",
                 this.stringToBytes(msg)).
@@ -278,7 +280,7 @@ export class BTCOM {
     * @return {Observable}  fire events when data comes from device
     */
     listen(){
-        BLE.startNotification(this.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6")
+        this.ble.startNotification(this.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6")
         .subscribe((data)=>{
             console.log("here with:"+ data);
             if(this.bytesToString(data).indexOf(">")!= -1){
