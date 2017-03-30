@@ -86,6 +86,7 @@ export class ParserEvents {
 					color: "red"
 				}
 		}
+		data.imei = sections[1];
 		return data;
   }
 
