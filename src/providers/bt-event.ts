@@ -28,7 +28,7 @@ export class BTEVENT {
 				if(this.buffer.indexOf("<")!= -1)
 				{
 					console.log("receiving event --->", this.buffer);
-					var response = this.parser.parserDefault(this.bt.bytesToString(this.buffer));
+					var response = this.parser.parserDefault(this.buffer);
 					this.events.publish("bt-event:data",response);
 					this.buffer= "";
 				}
