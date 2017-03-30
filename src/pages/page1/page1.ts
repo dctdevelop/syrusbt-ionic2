@@ -4,11 +4,13 @@ import { Preferences } from '../../providers/preferences';
 import { BLE } from '@ionic-native/ble';
 import { BTCOM } from '../../providers/bt-com';
 import { BTEVENT } from "../../providers/bt-event";
+import { GoogleMaps, GoogleMap } from "@ionic-native/google-maps";
 @Component({
   selector: 'page-page1',
   templateUrl: 'page1.html'
 })
 export class Page1 {
+	map: GoogleMap;
   devices = [];
   loader:Loading;
   constructor(public navCtrl: NavController,
@@ -17,6 +19,7 @@ export class Page1 {
   public pre:Preferences,
   public loading:LoadingController,
   public zone:NgZone,
+  public googlemaps:GoogleMaps,
   public bt:BTCOM,public btev:BTEVENT, public ble:BLE
   ) {}
 
@@ -38,6 +41,7 @@ export class Page1 {
 		  this.toast.create({message:"error connection to syrus", duration:1400}).present();
 		  this.stopScan();
 	  })
+	  this.createMap();
 
   }
 
@@ -90,6 +94,10 @@ export class Page1 {
 	});
   }
 
+  createMap(){
+	let element: HTMLElement = document.getElementById('map');
+	 this.map = this.googlemaps.create(element);
+  }
 
   sendQPV(){
       this.bt.send("QPV");

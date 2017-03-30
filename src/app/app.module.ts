@@ -17,6 +17,7 @@ import {BLE} from '@ionic-native/ble';
 import {SplashScreen} from '@ionic-native/splash-screen';
 import {StatusBar} from '@ionic-native/status-bar';
 import {Globalization} from '@ionic-native/globalization';
+import {GoogleMaps} from '@ionic-native/google-maps';
 export function createTranslateLoader(http: Http) {
     return new TranslateStaticLoader(http, 'assets/i18n', '.json');
 }
@@ -46,7 +47,7 @@ export function createTranslateLoader(http: Http) {
   ],
 
   providers: [{provide: ErrorHandler, useClass: IonicErrorHandler},
-  BLE,SplashScreen,StatusBar,Globalization,
+  BLE,SplashScreen,StatusBar,Globalization,GoogleMaps,
   Parser, Preferences,BTCOM,BTEVENT,ParserEvents, Storage]
 })
 export class AppModule {}
