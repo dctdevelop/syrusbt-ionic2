@@ -4,10 +4,15 @@ ion-header
 			ion-icon(name="menu")
 		ion-title Syrus Driver Bluetooth
 ion-content
-	ion-list
-		ion-list-header Syrus Devices
-		button(ion-item="", (click)="connect(device)", *ngFor="let device of devices")
-			| {{ device.name }}
+	ion-card(padding *ngIf="!bt.device")
+		ion-card-header Syrus Devices
+		ion-list
+			button(ion-item="", (click)="connect(device)", *ngFor="let device of devices")
+				| {{ device.name }}
+	ion-card(*ngIf="bt.device" padding)
+		button(ion-button="", full="", color="danger", (click)="disconnect()", icon-left) 
+			ion-icon(name="power")
+			| Disconnect
 
 
 

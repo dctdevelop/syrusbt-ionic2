@@ -30,11 +30,13 @@ export class Page1 {
 		  	this.loader.dismiss();
 			this.bt.device = device;
           	this.sendQPV();
+			this.stopScan();
       });
 
 	  this.events.subscribe("device:errorConnection", (err)=>{
 		  this.loader.dismiss();
 		  this.toast.create({message:"error connection to syrus", duration:1400}).present();
+		  this.stopScan();
 	  })
 
   }
@@ -42,9 +44,11 @@ export class Page1 {
   scan(){
       this.devices = [];
 	  console.log("scanning");
+	  this.ble.stopScan().then((response)=>{}).catch((err)=>{console.warn("stop scan", err)});
       this.ble.startScan([]).subscribe(
         (device)=>{
             this.zone.run(()=>{
+				console.log(device);
                 if(device.name!= undefined && device.name.indexOf("Syrus 3GBT") != -1)
                     this.devices.push(device);
             })
@@ -73,10 +77,16 @@ export class Page1 {
       this.events.publish("device:connect",device);
   }
 
+  disconnect(){
+	  this.events.publish("device:disconnect",this.bt.device);
+  }
+
   startEvents(){
+	console.log("subscribe to events");
 	this.btev.subscribe()
 	this.events.subscribe("bt-event:data", (data)=>{
-		this.toast.create({message: JSON.stringify(data.response),showCloseButton: true}).present();
+		console.log(data);
+		this.toast.create({message: data.event_time,showCloseButton: true, duration:1000}).present();
 	});
   }
 

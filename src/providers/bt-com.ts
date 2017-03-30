@@ -132,6 +132,13 @@ export class BTCOM {
         else{
 
             this.events.subscribe("device:disconnected",(device)=>{
+                // this.ble.stopNotification(this.device.id,"00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6");
+                this.device = undefined;
+                this.imei = undefined;
+                this.version = undefined;
+            });
+
+			this.events.subscribe("device:errorDisconnection",(device)=>{
                 this.ble.stopNotification(this.device.id,"00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6");
                 this.device = undefined;
                 this.imei = undefined;
@@ -160,8 +167,11 @@ export class BTCOM {
             });
 
             this.events.subscribe("device:disconnect",(device)=>{
-                this.ble.disconnect(this.device.id).then(
+				if(device == {} || device == undefined)
+					device = this.device;
+                this.ble.disconnect(device.id).then(
                     (response)=>{
+						console.log("device disconnected",response);
                         this.events.publish("device:disconnected",device);
                     })
                 .catch(
@@ -282,7 +292,6 @@ export class BTCOM {
     listen(){
         this.ble.startNotification(this.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0180-dc70-a07ba85ee4d6")
         .subscribe((data)=>{
-            console.log("here with:"+ data);
             if(this.bytesToString(data).indexOf(">")!= -1){
                 this.buffer = "";
             }

@@ -7,7 +7,7 @@ import { BLE } from '@ionic-native/ble';
 import { ParserEvents} from '../providers/parser-events';
 @Injectable()
 export class BTEVENT {
-
+	buffer= "";
   constructor(public ble:BLE,public http: Http, public bt:BTCOM, public events:Events, public parser:ParserEvents) {
   }
 
@@ -21,9 +21,17 @@ export class BTEVENT {
 	this.ble.startNotification(this.bt.device.id, "00000000-dc70-0080-dc70-a07ba85ee4d6", "00000000-dc70-0280-dc70-a07ba85ee4d6")
         .subscribe(
 			(data)=>{
-				var response = this.parser.parserDefault(this.bt.bytesToString(data))
-				console.log(response);
-				this.events.publish("bt-event:data",{data: response});
+				if(this.bt.bytesToString(data).indexOf(">")!= -1){
+					this.buffer = "";
+				}
+				this.buffer += this.bt.bytesToString(data);
+				if(this.buffer.indexOf("<")!= -1)
+				{
+					console.log("receiving event --->", this.buffer);
+					var response = this.parser.parserDefault(this.bt.bytesToString(this.buffer));
+					this.events.publish("bt-event:data",response);
+					this.buffer= "";
+				}
 			},
 			(err) =>{
 				console.error("error receiving event", err);
