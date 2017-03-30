@@ -2,7 +2,7 @@ import * as moment from 'moment';
 import { Injectable } from '@angular/core';
 import {Storage} from '@ionic/storage';
 import {TranslateService} from 'ng2-translate/ng2-translate';
-import {Globalization} from 'ionic-native';
+import {Globalization} from '@ionic-native/globalization';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class Preferences {
     languages;
     phrases;
     
-    constructor(public storage:Storage, public trans:TranslateService) {
+    constructor(public storage:Storage, public trans:TranslateService, public globalization:Globalization) {
         this.storage.get('color').then((data)=>{
             if(data != undefined)
             {
@@ -45,7 +45,7 @@ export class Preferences {
             }
         });
 
-        Globalization.getLocaleName().then(
+        this.globalization.getLocaleName().then(
             (lang)=>{
              this.language = lang.value.substring(0,lang.value.indexOf("-"));
              this.trans.use(this.language);
